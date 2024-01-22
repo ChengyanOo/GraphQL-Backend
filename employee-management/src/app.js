@@ -8,20 +8,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 const apollo_server_1 = require("apollo-server");
 const type_graphql_1 = require("type-graphql");
 const EmployeeResolver_1 = require("./resolvers/EmployeeResolver");
+const dotenv_1 = __importDefault(require("dotenv"));
 const typeorm_1 = require("typeorm");
 const Employee_1 = require("./entity/Employee");
+dotenv_1.default.config();
 const AppDataSource = new typeorm_1.DataSource({
-    type: "postgres",
-    host: "localhost",
-    port: 5432,
-    username: "tonsonwang",
-    password: "123456789",
-    database: "employee",
+    type: process.env.DB_TYPE,
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT || "5432", 10),
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
     entities: [Employee_1.Employee],
     synchronize: true,
 });

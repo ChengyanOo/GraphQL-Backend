@@ -2,19 +2,19 @@ import 'reflect-metadata';
 import { ApolloServer } from 'apollo-server';
 import { buildSchema } from 'type-graphql';
 import { EmployeeResolver } from './resolvers/EmployeeResolver';
-
+import dotenv from 'dotenv';
 import { DataSource } from "typeorm";
 import { Employee } from "./entity/Employee";
 
-
+dotenv.config();
 const AppDataSource = new DataSource({
-    type: "postgres", 
-    host: "localhost",
-    port: 5432,
-    username: "tonsonwang",
-    password: "123456789",
-    database: "employee",
-    entities: [Employee], 
+    type: process.env.DB_TYPE as "postgres",
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT || "5432", 10), // Provide default value and ensure it's a number
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+    entities: [Employee],
     synchronize: true, 
 });
 

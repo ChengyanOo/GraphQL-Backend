@@ -4,8 +4,11 @@ import { EmployeeSchema } from '../schemas/EmployeeSchema';
 import { Between, FindManyOptions, FindOptionsWhere, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { EmployeeInput } from '../input/EmployeeInput';
 
+// Defining a resolver for EmployeeSchema
 @Resolver(of => EmployeeSchema)
 export class EmployeeResolver {
+    
+    // GraphQL Query to get employees with options for sorting and filtering
     @Query(() => [EmployeeSchema])
     async employees(
         @Arg('orderBy', () => String, { nullable: true }) orderBy?: string,
@@ -19,6 +22,7 @@ export class EmployeeResolver {
         const whereOptions: FindOptionsWhere<Employee> = {};
         if (title) whereOptions.title = title;
         if (department) whereOptions.department = department;
+        // Handling salary range conditions
         if (minSalary !== undefined && maxSalary !== undefined) {
             whereOptions.salary = Between(minSalary, maxSalary);
         } else if (minSalary !== undefined) {
@@ -27,22 +31,25 @@ export class EmployeeResolver {
             whereOptions.salary = LessThanOrEqual(maxSalary);
         }
 
+        // Combining order and where options into find options
         const findOptions: FindManyOptions<Employee> = {
             order: orderOptions,
             where: whereOptions
         };
 
+        // Fetching employees from the database based on the find options
         const employees = await Employee.find(findOptions);
         return employees;
     }
 
-
+    // GraphQL Query to get a single employee by ID
     @Query(() => EmployeeSchema, { nullable: true })
     async employee(@Arg('id') id: number): Promise<EmployeeSchema | null> {
         const employee = await Employee.findOne({ where: { id } });
         return employee;
     }
 
+    // GraphQL Mutation to create a new employee
     @Mutation(() => EmployeeSchema)
     async createEmployee(@Arg('data') data: EmployeeInput): Promise<EmployeeSchema> {
         const employee = new Employee();
@@ -51,6 +58,7 @@ export class EmployeeResolver {
         return employee;
     }
 
+    // GraphQL Mutation to update an existing employee
     @Mutation(() => EmployeeSchema)
     async updateEmployee(
         @Arg('id') id: number,
@@ -60,9 +68,10 @@ export class EmployeeResolver {
         return this.employee(id);
     }
 
+    // GraphQL Mutation to delete an employee
     @Mutation(() => Boolean)
     async deleteEmployee(@Arg('id') id: number): Promise<boolean> {
         const deleteResult = await Employee.delete(id);
-        return (deleteResult.affected ?? 0) > 0;  // Use the nullish coalescing operator (??)
+        return (deleteResult.affected ?? 0) > 0; 
     }
 }

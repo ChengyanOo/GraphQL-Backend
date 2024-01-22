@@ -27,7 +27,9 @@ const Employee_1 = require("../entity/Employee");
 const EmployeeSchema_1 = require("../schemas/EmployeeSchema");
 const typeorm_1 = require("typeorm");
 const EmployeeInput_1 = require("../input/EmployeeInput");
+// Defining a resolver for EmployeeSchema
 let EmployeeResolver = class EmployeeResolver {
+    // GraphQL Query to get employees with options for sorting and filtering
     employees(orderBy, orderDirection, title, department, minSalary, maxSalary) {
         return __awaiter(this, void 0, void 0, function* () {
             const orderOptions = orderBy ? { [orderBy]: orderDirection } : {};
@@ -36,6 +38,7 @@ let EmployeeResolver = class EmployeeResolver {
                 whereOptions.title = title;
             if (department)
                 whereOptions.department = department;
+            // Handling salary range conditions
             if (minSalary !== undefined && maxSalary !== undefined) {
                 whereOptions.salary = (0, typeorm_1.Between)(minSalary, maxSalary);
             }
@@ -45,22 +48,24 @@ let EmployeeResolver = class EmployeeResolver {
             else if (maxSalary !== undefined) {
                 whereOptions.salary = (0, typeorm_1.LessThanOrEqual)(maxSalary);
             }
+            // Combining order and where options into find options
             const findOptions = {
                 order: orderOptions,
                 where: whereOptions
             };
+            // Fetching employees from the database based on the find options
             const employees = yield Employee_1.Employee.find(findOptions);
             return employees;
         });
     }
-    // // 4. As a user, I can query details of any employee
+    // GraphQL Query to get a single employee by ID
     employee(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const employee = yield Employee_1.Employee.findOne({ where: { id } });
             return employee;
         });
     }
-    // // 6. As a user, I can add a new employee
+    // GraphQL Mutation to create a new employee
     createEmployee(data) {
         return __awaiter(this, void 0, void 0, function* () {
             const employee = new Employee_1.Employee();
@@ -69,19 +74,19 @@ let EmployeeResolver = class EmployeeResolver {
             return employee;
         });
     }
-    // // 5. As a user, I can update details of any employee
+    // GraphQL Mutation to update an existing employee
     updateEmployee(id, data) {
         return __awaiter(this, void 0, void 0, function* () {
             yield Employee_1.Employee.update(id, data);
             return this.employee(id);
         });
     }
-    // // 7. As a user, I can delete any employee
+    // GraphQL Mutation to delete an employee
     deleteEmployee(id) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const deleteResult = yield Employee_1.Employee.delete(id);
-            return ((_a = deleteResult.affected) !== null && _a !== void 0 ? _a : 0) > 0; // Use the nullish coalescing operator (??)
+            return ((_a = deleteResult.affected) !== null && _a !== void 0 ? _a : 0) > 0;
         });
     }
 };
