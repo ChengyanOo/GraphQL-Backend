@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -22,20 +25,107 @@ exports.EmployeeResolver = void 0;
 const type_graphql_1 = require("type-graphql");
 const Employee_1 = require("../entity/Employee");
 const EmployeeSchema_1 = require("../schemas/EmployeeSchema");
+const typeorm_1 = require("typeorm");
+const EmployeeInput_1 = require("../input/EmployeeInput");
 let EmployeeResolver = class EmployeeResolver {
-    employees() {
+    employees(orderBy, orderDirection, title, department, minSalary, maxSalary) {
         return __awaiter(this, void 0, void 0, function* () {
-            const employees = yield Employee_1.Employee.find();
+            const orderOptions = orderBy ? { [orderBy]: orderDirection } : {};
+            const whereOptions = {};
+            if (title)
+                whereOptions.title = title;
+            if (department)
+                whereOptions.department = department;
+            if (minSalary !== undefined && maxSalary !== undefined) {
+                whereOptions.salary = (0, typeorm_1.Between)(minSalary, maxSalary);
+            }
+            else if (minSalary !== undefined) {
+                whereOptions.salary = (0, typeorm_1.MoreThanOrEqual)(minSalary);
+            }
+            else if (maxSalary !== undefined) {
+                whereOptions.salary = (0, typeorm_1.LessThanOrEqual)(maxSalary);
+            }
+            const findOptions = {
+                order: orderOptions,
+                where: whereOptions
+            };
+            const employees = yield Employee_1.Employee.find(findOptions);
             return employees;
+        });
+    }
+    // // 4. As a user, I can query details of any employee
+    employee(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const employee = yield Employee_1.Employee.findOne({ where: { id } });
+            return employee;
+        });
+    }
+    // // 6. As a user, I can add a new employee
+    createEmployee(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const employee = new Employee_1.Employee();
+            Object.assign(employee, data);
+            yield employee.save();
+            return employee;
+        });
+    }
+    // // 5. As a user, I can update details of any employee
+    updateEmployee(id, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield Employee_1.Employee.update(id, data);
+            return this.employee(id);
+        });
+    }
+    // // 7. As a user, I can delete any employee
+    deleteEmployee(id) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            const deleteResult = yield Employee_1.Employee.delete(id);
+            return ((_a = deleteResult.affected) !== null && _a !== void 0 ? _a : 0) > 0; // Use the nullish coalescing operator (??)
         });
     }
 };
 __decorate([
     (0, type_graphql_1.Query)(() => [EmployeeSchema_1.EmployeeSchema]),
+    __param(0, (0, type_graphql_1.Arg)('orderBy', () => String, { nullable: true })),
+    __param(1, (0, type_graphql_1.Arg)('orderDirection', () => String, { defaultValue: 'ASC' })),
+    __param(2, (0, type_graphql_1.Arg)('title', () => String, { nullable: true })),
+    __param(3, (0, type_graphql_1.Arg)('department', () => String, { nullable: true })),
+    __param(4, (0, type_graphql_1.Arg)('minSalary', () => type_graphql_1.Float, { nullable: true })),
+    __param(5, (0, type_graphql_1.Arg)('maxSalary', () => type_graphql_1.Float, { nullable: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, String, String, String, Number, Number]),
     __metadata("design:returntype", Promise)
 ], EmployeeResolver.prototype, "employees", null);
+__decorate([
+    (0, type_graphql_1.Query)(() => EmployeeSchema_1.EmployeeSchema, { nullable: true }),
+    __param(0, (0, type_graphql_1.Arg)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], EmployeeResolver.prototype, "employee", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => EmployeeSchema_1.EmployeeSchema),
+    __param(0, (0, type_graphql_1.Arg)('data')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [EmployeeInput_1.EmployeeInput]),
+    __metadata("design:returntype", Promise)
+], EmployeeResolver.prototype, "createEmployee", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => EmployeeSchema_1.EmployeeSchema),
+    __param(0, (0, type_graphql_1.Arg)('id')),
+    __param(1, (0, type_graphql_1.Arg)('data')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, EmployeeInput_1.EmployeeInput]),
+    __metadata("design:returntype", Promise)
+], EmployeeResolver.prototype, "updateEmployee", null);
+__decorate([
+    (0, type_graphql_1.Mutation)(() => Boolean),
+    __param(0, (0, type_graphql_1.Arg)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], EmployeeResolver.prototype, "deleteEmployee", null);
 EmployeeResolver = __decorate([
     (0, type_graphql_1.Resolver)(of => EmployeeSchema_1.EmployeeSchema)
 ], EmployeeResolver);
