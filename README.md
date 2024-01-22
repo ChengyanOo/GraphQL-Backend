@@ -54,8 +54,9 @@ DB_DATABASE=
 ```
 
 ### 8. Run the Application
-Execute the following command from the 'employee-management' directory to start the server:
+Execute the following command from the 'employee-management' directory to complie ts code in js and start the server:
 ```bash
+tsc
 npm start
 ```
 
