@@ -55,9 +55,9 @@ DB_DATABASE=
 
 ### 8. Run the Application
 Execute the following command from the 'employee-management' directory to start the server:
-\```bash
+```bash
 npm start
-\```
+```
 
 ## Usage
 After starting the server, you can interact with the GraphQL API at:
