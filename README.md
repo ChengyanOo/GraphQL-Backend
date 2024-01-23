@@ -43,26 +43,37 @@ Ensure your PostgreSQL server is up and running.
 Create a new PostgreSQL database with a name of your choice.
 
 ### 7. Environment Configuration
-Create a `.env` file in the root of your employee management project directory and fill it with your database credentials and details:
+Create a `.env` file in the root of your employee management project directory. This file should contain your database credentials and details. Fill in the necessary information corresponding to your database setup:
+
 ```env
 DB_TYPE=postgres
 DB_HOST=localhost
 DB_PORT=5432
-DB_USERNAME=
-DB_PASSWORD=
-DB_DATABASE=
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+DB_DATABASE=your_database_name
 ```
 
 ### 8. Run the Application
-Execute the following command from the 'employee-management' directory to complie ts code in js and start the server:
+Before running the application, ensure your TypeScript files are compiled to JavaScript. Navigate to the root of your 'employee-management' directory and execute the TypeScript compiler:
 ```bash
 tsc
+```
+After successfully compiling your TypeScript files, you can start the server by running:
+```bash
 npm start
 ```
 
 ## Usage
 After starting the server, you can interact with the GraphQL API at:
 `http://localhost:4000/graphql`
+
+## Running Tests
+To ensure your GraphQL resolvers are functioning correctly, it's important to run tests. This project utilizes Jest for testing. Execute the following command to run the Jest test suite:
+
+```bash
+npm test
+```
 
 ## Notes
 - The project is configured to run with Node.js version 14.21.3. Ensure you are using this version to avoid potential compatibility issues.
