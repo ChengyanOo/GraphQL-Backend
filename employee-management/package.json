@@ -9,7 +9,6 @@
   },
   "author": "Chengyan",
   "license": "ISC",
-
   "dependencies": {
     "apollo-server": "^3.13.0",
     "class-validator": "^0.14.1",

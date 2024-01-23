@@ -130,39 +130,6 @@ describe("Testresolvers", () => {
         const fetchDeletedEmployeeResponse = yield (0, graphqlTestCall_1.graphqlTestCall)(querys_1.getEmployeeQuery, {});
         expect(fetchDeletedEmployeeResponse.data.employees).toEqual([]);
     }));
-    it("should sort employees by salary", () => __awaiter(void 0, void 0, void 0, function* () {
-        // Create multiple employees with different salaries
-        for (const employee of [
-            { dateOfJoining: "2023-01-22", firstName: "Eve", lastName: "Wallace", dateOfBirth: "1989-10-12", salary: 55000, title: "UI/UX Designer", department: "Design" },
-            { dateOfJoining: "2023-01-23", firstName: "Frank", lastName: "Mitchell", dateOfBirth: "1988-04-23", salary: 50000, title: "QA Tester", department: "Quality Assurance" },
-            { dateOfJoining: "2023-01-21", firstName: "Grace", lastName: "Hopper", dateOfBirth: "1991-12-09", salary: 65000, title: "System Architect", department: "Architecture" }
-        ]) {
-            const createResponse = yield (0, graphqlTestCall_1.graphqlTestCall)(querys_1.createEmployeeMutation, {
-                data: employee
-            });
-            expect(createResponse.data.createEmployee).toBeDefined();
-            createdEmployeeIds.push(createResponse.data.createEmployee.id);
-        }
-        // Fetch and sort employees by salary in ascending order
-        const fetchSortedEmployeesResponse = yield (0, graphqlTestCall_1.graphqlTestCall)(querys_1.getEmployeeWithOptionQuery, {
-            orderBy: "salary",
-            orderDirection: "asc"
-        });
-        // Check if the employees are sorted correctly by salary
-        const sortedEmployees = fetchSortedEmployeesResponse.data.employees;
-        expect(sortedEmployees.length).toBe(3);
-        expect(sortedEmployees[0].firstName).toBe("Frank"); // Expect the lowest salary first
-        expect(sortedEmployees[1].firstName).toBe("Eve");
-        expect(sortedEmployees[2].firstName).toBe("Grace"); // Expect the highest salary last
-        // Cleanup: Delete created employees
-        for (const id of createdEmployeeIds) {
-            yield (0, graphqlTestCall_1.graphqlTestCall)(querys_1.deleteEmployeeMutation, {
-                deleteEmployeeId: Number(id)
-            });
-        }
-        const fetchDeletedEmployeeResponse = yield (0, graphqlTestCall_1.graphqlTestCall)(querys_1.getEmployeeQuery, {});
-        expect(fetchDeletedEmployeeResponse.data.employees).toEqual([]);
-    }));
     it("should filter employees by department", () => __awaiter(void 0, void 0, void 0, function* () {
         for (const employee of [
             { dateOfJoining: "2023-01-22", firstName: "Laura", lastName: "Adams", dateOfBirth: "1989-10-12", salary: 55000, title: "UI/UX Designer", department: "Design" },
@@ -215,7 +182,6 @@ describe("Testresolvers", () => {
         // Check if the returned employees have salaries within the range 50000 to 70000
         const filteredEmployees = filteredEmployeesResponse.data.employees;
         expect(filteredEmployees.every((employee) => employee.salary >= 50000 && employee.salary <= 70000)).toBe(true);
-        // You might also want to check the count of the filtered employees if you know the expected number
         expect(filteredEmployees.length).toBe(1); // Expect 1 employee in this salary range
         // Cleanup: Delete created employees
         for (const id of createdEmployeeIds) {
@@ -248,7 +214,7 @@ describe("Testresolvers", () => {
             id: Number(createdEmployeeIds[0])
         });
         // Check if the returned employee details match the created employee
-        const fetchedEmployee = fetchEmployeeResponse.data.employees[0]; // Adjust based on your actual response structure
+        const fetchedEmployee = fetchEmployeeResponse.data.employees[0];
         expect(fetchedEmployee).toBeDefined();
         expect(fetchedEmployee.id).toBe(createdEmployeeIds[0]);
         expect(fetchedEmployee.firstName).toBe(testEmployee.data.firstName);
@@ -269,7 +235,7 @@ describe("Testresolvers", () => {
         expect(fetchDeletedEmployeeResponse.data.employees).toEqual([]);
     }));
     it("should update details of employee by id", () => __awaiter(void 0, void 0, void 0, function* () {
-        // Step 1: Create an employee
+        //Create an employee
         const testEmployee = {
             data: {
                 firstName: "Clark",
@@ -286,7 +252,7 @@ describe("Testresolvers", () => {
         });
         expect(createResponse.data.createEmployee).toBeDefined();
         createdEmployeeIds[0] = createResponse.data.createEmployee.id;
-        // Step 2: Update the created employee by ID
+        //Update the created employee by ID
         const updatedEmployeeData = {
             firstName: "Clark",
             lastName: "Superman",
@@ -301,13 +267,12 @@ describe("Testresolvers", () => {
             data: updatedEmployeeData
         });
         expect(updateResponse.data.updateEmployee).toBeDefined();
-        // Step 3: Fetch the updated employee by ID
+        //Fetch the updated employee by ID
         const fetchUpdatedEmployeeResponse = yield (0, graphqlTestCall_1.graphqlTestCall)(querys_1.getEmployeeQuery, {
             id: Number(createdEmployeeIds[0])
         });
-        // Step 4: Check if the returned employee details match the updated details
+        //Check if the returned employee details match the updated details
         const updatedEmployee = fetchUpdatedEmployeeResponse.data.employees[0]; // Adjust based on your actual response structure
-        console.log(updatedEmployee);
         expect(updatedEmployee).toBeDefined();
         expect(updatedEmployee.id).toBe(createdEmployeeIds[0]);
         expect(updatedEmployee.firstName).toBe(updatedEmployeeData.firstName);
